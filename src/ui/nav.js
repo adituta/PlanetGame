@@ -1,13 +1,9 @@
-// ====== Navigație taburi ======
-  document.querySelectorAll('.tab').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'))
-      btn.classList.add('active')
-      const show = btn.getAttribute('data-tab')
-      document.querySelectorAll('[data-panel]').forEach(p=>{
-        p.hidden = p.getAttribute('data-panel')!==show
-      })
-      // refresh conținut tab curent
-      renderAll()
-    })
+export function makeMenu(items, onChange){
+  const nav=document.getElementById('menu'); nav.innerHTML=''
+  items.forEach((it,i)=>{
+    const b=document.createElement('button'); b.textContent=it.label; if(i===0) b.classList.add('active')
+    b.onclick=()=>{ nav.querySelectorAll('button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); onChange(it.id) }
+    nav.appendChild(b)
   })
+  onChange(items[0].id)
+}
