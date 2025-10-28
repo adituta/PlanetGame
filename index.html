@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PlanetGame – Create Your Empire</title>
+  <link rel="stylesheet" href="stiluri.css">
+  <script type="module" src="/src/main.js"></script>
+</head>
+
+
+<body>
+  <header>
+    <div class="row">
+      <div class="title">PlanetGame – Create Your Empire</div>
+    </div>
+    <!-- acesta este div-ul pentru eticheta-->
+    <div class="badge">Modelate and Simulate your Emipre</div>
+  </header>
+
+  <div class="container">
+    <!-- ===== HEADS-UP DISPLAY: resurse curente ===== -->
+    <div class="hud">
+      <div class="card">
+        <div class="label">Metal</div>
+        <div class="row"><div class="value" id="metal">0</div><div class="hint" id="metalRate">+0/s</div></div>
+      </div>
+      <div class="card">
+        <div class="label">Cristal</div>
+        <div class="row"><div class="value" id="crystal">0</div><div class="hint" id="crystalRate">+0/s</div></div>
+      </div>
+      <div class="card">
+        <div class="label">Deuteriu</div>
+        <div class="row"><div class="value" id="deuterium">0</div><div class="hint" id="deutRate">+0/s</div></div>
+      </div>
+      <div class="card">
+        <div class="label">Energie (capacitate)</div>
+        <div class="row"><div class="value" id="energy">0</div><div class="hint" id="energyCap">cap: 0</div></div>
+      </div>
+    </div>
+
+    <!-- ===== MENIU ===== -->
+    <nav>
+      <button class="tab active" data-tab="planet">Planeta</button>
+      <button class="tab" data-tab="constructii">Construcții</button>
+      <button class="tab" data-tab="facilitati">Facilități</button>
+      <button class="tab" data-tab="cercetare">Cercetare</button>
+      <button class="tab" data-tab="nave">Șantier (Nave)</button>
+      <button class="tab" data-tab="aparare">Apărare</button>
+      <button class="tab" data-tab="flota">Flotă & Bătălii</button>
+      <button class="tab" data-tab="rapoarte">Rapoarte</button>
+      <button class="tab" data-tab="salvare">Salvare/Reset</button>
+    </nav>
+
+    <!-- ===== TAB: PLANETA ===== -->
+    <section class="card" data-panel="planet">
+      <h3>Planeta ta</h3>
+      <p class="hint">Ai o singură planetă. Resursele cresc în timp în funcție de nivelul minelor. Logica este simplă și deterministă pentru a putea explica ușor modelul.</p>
+      <div class="grid">
+        <div class="card">
+          <h4>Clădiri de producție</h4>
+          <div class="list" id="buildingsList"></div>
+        </div>
+        <div class="card">
+          <h4>Stare planetă</h4>
+          <table>
+            <tbody>
+              <tr><th>Nivel Fabrică</th><td id="lvlFactory">0</td></tr>
+              <tr><th>Nivel Laborator</th><td id="lvlLab">0</td></tr>
+              <tr><th>Nivel Șantier</th><td id="lvlShipyard">0</td></tr>
+            </tbody>
+          </table>
+          <div class="sep"></div>
+          <div class="hint">Fabrică = accelerează construcțiile (reducere timp). În această versiune, majoritatea acțiunilor sunt instant (pentru simplitate), însă fabrica poate impune un cost mai mic la modernizări.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB: CONSTRUCTII ===== -->
+    <section class="card" data-panel="constructii" hidden>
+      <h3>Construcții (mine & centrale)</h3>
+      <div id="constructiiList" class="list"></div>
+    </section>
+
+    <!-- ===== TAB: FACILITATI ===== -->
+    <section class="card" data-panel="facilitati" hidden>
+      <h3>Facilități</h3>
+      <div id="facilitatiList" class="list"></div>
+    </section>
+
+    <!-- ===== TAB: CERCETARE ===== -->
+    <section class="card" data-panel="cercetare" hidden>
+      <h3>Cercetare</h3>
+      <p class="hint">Fiecare nivel dă un bonus global: Arme +10% atac/nivel, Scuturi reduc daunele primite cu 5%/nivel (până la 50%), Blindaj +10% viață/nivel.</p>
+      <div id="researchList" class="list"></div>
+    </section>
+
+    <!-- ===== TAB: NAVE ===== -->
+    <section class="card" data-panel="nave" hidden>
+      <h3>Șantier naval – construcție nave</h3>
+      <div id="shipList" class="list"></div>
+    </section>
+
+    <!-- ===== TAB: APARARE ===== -->
+    <section class="card" data-panel="aparare" hidden>
+      <h3>Apărare planetară</h3>
+      <div id="defList" class="list"></div>
+    </section>
+
+    <!-- ===== TAB: FLOTA & BATALII ===== -->
+    <section class="card" data-panel="flota" hidden>
+      <h3>Flotă & Simulare de bătălii</h3>
+      <div class="grid">
+        <div class="card">
+          <h4>Flota ta actuală</h4>
+          <table id="myFleetTable"></table>
+          <div class="sep"></div>
+          <h4>Apărare planetară</h4>
+          <table id="myDefTable"></table>
+        </div>
+        <div class="card">
+          <h4>Oponent custom</h4>
+          <div class="hint">Definește rapid compoziția oponentului și apasă „Simulează bătălia”.</div>
+          <div id="opponentBuilder"></div>
+          <div class="sep"></div>
+          <button class="primary" id="btnSimulate">Simulează bătălia</button>
+          <button id="btnQuick">Adversar aleator (echilibrat)</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB: RAPOARTE ===== -->
+    <section class="card" data-panel="rapoarte" hidden>
+      <h3>Rapoarte</h3>
+      <div class="log" id="reportLog"></div>
+    </section>
+
+    <!-- ===== TAB: SALVARE ===== -->
+    <section class="card" data-panel="salvare" hidden>
+      <h3>Salvare / Reset</h3>
+      <p>Progresul se salvează automat în <code>localStorage</code>. Poți exporta/importa manual.</p>
+      <div class="grid">
+        <div class="card">
+          <h4>Export</h4>
+          <button id="btnExport">Descarcă salvarea</button>
+        </div>
+        <div class="card">
+          <h4>Import</h4>
+          <input type="file" id="fileImport" accept="application/json" />
+          <div class="sep"></div>
+          <button id="btnReset" class="bad">Reset joc</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+  // =============================================================
+  //  Mini OGame – logica foarte simplificată pentru înțelegere
+  //  Obiectiv: proiect educațional pentru cursul de modelare & simulare
+  //  Chei: producție deterministă, tehnologie cu buff-uri globale,
+  //        bătălie deterministă pe runde cu distribuție proporțională a pagubelor.
+  //  TOTUL într-un singur fișier pentru lizibilitate.
+  // =============================================================
+
+  // --------- Date de bază despre unități (valori mici pentru claritate) ---------
+  const UNITS = {
+    ships: {
+      SmallFighter: { name: 'Vânător mic',     cost: {M:800, C:400, D:0},    atk: 50,  hp: 150 },
+      LargeFighter: { name: 'Vânător mare',    cost: {M:3000,C:1000,D:0},    atk: 120, hp: 400 },
+      Cruiser:      { name: 'Crucişător',      cost: {M:7000,C:4000,D:1000}, atk: 300, hp: 900 },
+      Battleship:   { name: 'Cuirasat',        cost: {M:12000,C:6000,D:2000}, atk: 600, hp: 2000 },
+      Bomber:       { name: 'Bombardier',      cost: {M:20000,C:10000,D:6000},atk: 900, hp: 2800 },
+    },
+    defense: {
+      Rocket: { name: 'Rachetă',       cost: {M:1500,C:500,D:0},   atk: 80,  hp: 300 },
+      Laser:  { name: 'Turelă laser',  cost: {M:3000,C:1500,D:0},  atk: 160, hp: 700 },
+      Gauss:  { name: 'Tun Gauss',     cost: {M:8000,C:5000,D:2000},atk: 420, hp: 2200 },
+    }
+  }
+
+  // --------- Clădiri de producție & facilități ---------
+  const BUILDINGS = {
+    MetalMine:   { name:'Mină de Metal',    base: 20,   growth: 1.2,   energy: 2,  cost:{M:60, C:15, D:0} },
+    CrystalMine: { name:'Mină de Cristal',  base: 12,   growth: 1.2,   energy: 2,  cost:{M:48, C:24, D:0} },
+    DeutSynth:   { name:'Sintetizator D',   base: 6,    growth: 1.2,   energy: 3,  cost:{M:100,C:50, D:0} },
+    SolarPlant:  { name:'Centrală solară',  base: 20,   growth: 1.25,  energy: -0, cost:{M:80, C:30, D:0} }, // produce energie
+  }
+
+  const FACILITATI = {
+    Factory:  { name:'Fabrică', cost:{M:200, C:100, D:0} },
+    Lab:      { name:'Laborator', cost:{M:250, C:150, D:50} },
+    Shipyard: { name:'Șantier', cost:{M:300, C:200, D:80} },
+  }
+
+  const RESEARCH = {
+    Weapons:  { name:'Arme',     desc:'+10% atac / nivel',  cost:{M:400, C:200, D:100} },
+    Shields:  { name:'Scuturi',  desc:'-5% daune / nivel',  cost:{M:300, C:300, D:200} },
+    Armour:   { name:'Blindaj',  desc:'+10% viață / nivel', cost:{M:300, C:150, D:200} },
+  }
+
+  // --------- Starea jocului ---------
+  const DEFAULT_STATE = {
+    res:{M:200, C:100, D:0, E:0, ECap:0},
+    buildings:{ MetalMine:1, CrystalMine:1, DeutSynth:0, SolarPlant:1 },
+    facilitati:{ Factory:0, Lab:0, Shipyard:0 },
+    research:{ Weapons:0, Shields:0, Armour:0 },
+    ships:{ SmallFighter:0, LargeFighter:0, Cruiser:0, Battleship:0, Bomber:0 },
+    defense:{ Rocket:0, Laser:0, Gauss:0 },
+    reports:[],
+    lastTick: Date.now()
+  }
+
+  let S = loadState() || DEFAULT_STATE
+
+  // ===== Utilitare =====
+  function saveState(){ localStorage.setItem('miniOgameSave', JSON.stringify(S)) }
+  function loadState(){ try{ return JSON.parse(localStorage.getItem('miniOgameSave')) }catch{ return null } }
+  function fmt(n){ return Math.floor(n).toLocaleString('ro-RO') }
+
+  function canAfford(cost){
+    return S.res.M>=cost.M && S.res.C>=cost.C && S.res.D>=cost.D
+  }
+  function pay(cost){ S.res.M-=cost.M; S.res.C-=cost.C; S.res.D-=cost.D }
+
+  // ===== Producție resurse =====
+  function buildingOutput(){
+    // producție pe secundă (deterministă, simplă): base * level^growth
+    const mm = BUILDINGS.MetalMine
+    const cm = BUILDINGS.CrystalMine
+    const ds = BUILDINGS.DeutSynth
+    const sp = BUILDINGS.SolarPlant
+
+    const prodM = mm.base * Math.pow(S.buildings.MetalMine, mm.growth)
+    const prodC = cm.base * Math.pow(S.buildings.CrystalMine, cm.growth)
+    const prodD = ds.base * Math.pow(S.buildings.DeutSynth, ds.growth)
+
+    // energie: centrale adaugă capacitate; mine consumă proporțional
+    const energyCap = 20 * Math.pow(S.buildings.SolarPlant, sp.growth)
+    const energyUse = (mm.energy * S.buildings.MetalMine) + (cm.energy * S.buildings.CrystalMine) + (ds.energy * S.buildings.DeutSynth)
+    const energyFactor = Math.min(1, energyCap / Math.max(1, energyUse))
+
+    return { prodM: prodM*energyFactor, prodC: prodC*energyFactor, prodD: prodD*energyFactor, energyCap, energyUse }
+  }
+
+  function tick(){
+    const now = Date.now();
+    const dt = Math.max(0, (now - S.lastTick)/1000); // secunde
+    S.lastTick = now
+    const out = buildingOutput()
+    S.res.M += out.prodM * dt
+    S.res.C += out.prodC * dt
+    S.res.D += out.prodD * dt
+    S.res.E = Math.max(0, out.energyCap - out.energyUse)
+    S.res.ECap = out.energyCap
+    renderHUD()
+    saveState()
+  }
+
+  setInterval(tick, 1000)
+  tick()
+
+  // ====== Render HUD ======
+  function renderHUD(){
+    byId('metal').textContent = fmt(S.res.M)
+    byId('crystal').textContent = fmt(S.res.C)
+    byId('deuterium').textContent = fmt(S.res.D)
+    byId('energy').textContent = fmt(S.res.E)
+    byId('energyCap').textContent = 'cap: '+fmt(S.res.ECap)
+
+    const out = buildingOutput()
+    byId('metalRate').textContent = '+'+fmt(out.prodM)+'/s'
+    byId('crystalRate').textContent = '+'+fmt(out.prodC)+'/s'
+    byId('deutRate').textContent = '+'+fmt(out.prodD)+'/s'
+
+    byId('lvlFactory').textContent = S.facilitati.Factory
+    byId('lvlLab').textContent = S.facilitati.Lab
+    byId('lvlShipyard').textContent = S.facilitati.Shipyard
+  }
+
+  // ====== UI helpers ======
+  function byId(id){ return document.getElementById(id) }
+  function h(tag, attrs={}, children=[]){
+    const el=document.createElement(tag)
+    Object.entries(attrs).forEach(([k,v])=>{
+      if(k==='class') el.className=v
+      else if(k.startsWith('on')) el.addEventListener(k.slice(2).toLowerCase(), v)
+      else if(k==='html') el.innerHTML=v
+      else el.setAttribute(k,v)
+    })
+    ;(Array.isArray(children)?children:[children]).filter(Boolean).forEach(c=>{
+      if(typeof c==='string') el.appendChild(document.createTextNode(c))
+      else el.appendChild(c)
+    })
+    return el
+  }
+
+  // ====== Construcții (UI) ======
+  function renderBuildingsList(){
+    const root = byId('buildingsList'); root.innerHTML=''
+    Object.entries(S.buildings).forEach(([key, lvl])=>{
+      const cfg = BUILDINGS[key]
+      const cost = scaledCost(cfg.cost, lvl)
+      root.appendChild(
+        h('div',{class:'item'},[
+          h('div',{},[
+            h('div',{class:'label'}, cfg.name),
+            h('div',{class:'hint'}, `Nivel: ${lvl} • Cost upg.: M ${fmt(cost.M)} / C ${fmt(cost.C)} / D ${fmt(cost.D)}`)
+          ]),
+          h('div',{},[
+            h('button',{class:'primary', onclick:()=>upgradeBuilding(key)},'Modernizează')
+          ])
+        ])
+      )
+    })
+  }
+
+  function renderConstructii(){
+    const root = byId('constructiiList'); root.innerHTML=''
+    Object.entries(BUILDINGS).forEach(([key, cfg])=>{
+      const lvl = S.buildings[key]
+      const cost = scaledCost(cfg.cost, lvl)
+      const btn = h('button',{class:'primary', onclick:()=>upgradeBuilding(key)},'Modernizează')
+      if(!canAfford(cost)) btn.disabled=true
+      root.appendChild(
+        h('div',{class:'item'},[
+          h('div',{},[
+            h('div',{class:'label'}, cfg.name),
+            h('div',{class:'hint'}, `Nivel curent: ${lvl} • Cost: M ${fmt(cost.M)} / C ${fmt(cost.C)} / D ${fmt(cost.D)}`)
+          ]),
+          btn
+        ])
+      )
+    })
+  }
+
+  function renderFacilitati(){
+    const root = byId('facilitatiList'); root.innerHTML=''
+    Object.entries(FACILITATI).forEach(([key, cfg])=>{
+      const lvl = S.facilitati[key]
+      const cost = scaledCost(cfg.cost, lvl)
+      const btn = h('button',{class:'primary', onclick:()=>upgradeFacilitate(key)},'Modernizează')
+      if(!canAfford(cost)) btn.disabled=true
+      root.appendChild(
+        h('div',{class:'item'},[
+          h('div',{},[
+            h('div',{class:'label'}, cfg.name),
+            h('div',{class:'hint'}, `Nivel curent: ${lvl} • Cost: M ${fmt(cost.M)} / C ${fmt(cost.C)} / D ${fmt(cost.D)}`)
+          ]),
+          btn
+        ])
+      )
+    })
+  }
+
+  function renderResearch(){
+    const root = byId('researchList'); root.innerHTML=''
+    Object.entries(RESEARCH).forEach(([key, cfg])=>{
+      const lvl = S.research[key]
+      const cost = scaledCost(cfg.cost, lvl)
+      const btn = h('button',{class:'primary', onclick:()=>doResearch(key)},'Cercetează')
+      if(!canAfford(cost) || S.facilitati.Lab<=0) btn.disabled=true
+      root.appendChild(
+        h('div',{class:'item'},[
+          h('div',{},[
+            h('div',{class:'label'}, `${cfg.name} (lvl ${lvl})`),
+            h('div',{class:'hint'}, `${cfg.desc} • Cost: M ${fmt(cost.M)} / C ${fmt(cost.C)} / D ${fmt(cost.D)}`)
+          ]),
+          btn
+        ])
+      )
+    })
+  }
+
+  function renderShips(){
+    const root = byId('shipList'); root.innerHTML=''
+    Object.entries(UNITS.ships).forEach(([key, cfg])=>{
+      const btn = h('button',{class:'primary', onclick:()=>buildUnit('ships', key)},'Construiește 1')
+      if(!canAfford(cfg.cost) || S.facilitati.Shipyard<=0) btn.disabled=true
+      root.appendChild(
+        h('div',{class:'item'},[
+          h('div',{},[
+            h('div',{class:'label'}, cfg.name),
+            h('div',{class:'hint'}, `Cost: M ${fmt(cfg.cost.M)} / C ${fmt(cfg.cost.C)} / D ${fmt(cfg.cost.D)} • Atk ${cfg.atk} • HP ${cfg.hp}`)
+          ]),
+          h('div',{},[
+            h('span',{class:'hint', style:'margin-right:8px'}, `Deții: ${S.ships[key]}`),
+            btn
+          ])
+        ])
+      )
+    })
+  }
+
+  function renderDefense(){
+    const root = byId('defList'); root.innerHTML=''
+    Object.entries(UNITS.defense).forEach(([key, cfg])=>{
+      const btn = h('button',{class:'primary', onclick:()=>buildUnit('defense', key)},'Construiește 1')
+      if(!canAfford(cfg.cost)) btn.disabled=true
+      root.appendChild(
+        h('div',{class:'item'},[
+          h('div',{},[
+            h('div',{class:'label'}, cfg.name),
+            h('div',{class:'hint'}, `Cost: M ${fmt(cfg.cost.M)} / C ${fmt(cfg.cost.C)} / D ${fmt(cfg.cost.D)} • Atk ${cfg.atk} • HP ${cfg.hp}`)
+          ]),
+          h('div',{},[
+            h('span',{class:'hint', style:'margin-right:8px'}, `Deții: ${S.defense[key]}`),
+            btn
+          ])
+        ])
+      )
+    })
+  }
+
+  function renderFleetTables(){
+    byId('myFleetTable').innerHTML = tableFromUnits(S.ships)
+    byId('myDefTable').innerHTML = tableFromUnits(S.defense)
+  }
+
+  function tableFromUnits(dict){
+    let html = '<tr><th>Unitate</th><th class="right">Număr</th><th class="right">Atk</th><th class="right">HP</th></tr>'
+    for(const [key, n] of Object.entries(dict)){
+      const cfg = (UNITS.ships[key]||UNITS.defense[key])
+      html += `<tr><td>${cfg.name}</td><td class="right">${fmt(n)}</td><td class="right">${cfg.atk}</td><td class="right">${cfg.hp}</td></tr>`
+    }
+    return html
+  }
+
+  function renderOpponentBuilder(){
+    const root = byId('opponentBuilder'); root.innerHTML=''
+    // controale pentru nave & apărare + tech adversar
+    const grid = h('div',{class:'grid-3'})
+    // Ships
+    const shipCol = h('div',{class:'card'},[h('div',{class:'label'},'Nave oponent'), ...Object.entries(UNITS.ships).map(([k,c])=>
+      h('div',{class:'row', style:'margin-top:6px'},[
+        h('span',{},c.name),
+        h('input',{type:'number', min:0, value:0, id:'op_ship_'+k, style:'width:90px; background:#0b1023; color:var(--text); border:1px solid #263041; border-radius:6px; padding:6px'})
+      ])
+    )])
+    // Defense
+    const defCol = h('div',{class:'card'},[h('div',{class:'label'},'Apărare oponent'), ...Object.entries(UNITS.defense).map(([k,c])=>
+      h('div',{class:'row', style:'margin-top:6px'},[
+        h('span',{},c.name),
+        h('input',{type:'number', min:0, value:0, id:'op_def_'+k, style:'width:90px; background:#0b1023; color:var(--text); border:1px solid #263041; border-radius:6px; padding:6px'})
+      ])
+    )])
+    // Tech
+    const techCol = h('div',{class:'card'},[
+      h('div',{class:'label'},'Tehnologii oponent'),
+      ...['Weapons','Shields','Armour'].map(t=>h('div',{class:'row', style:'margin-top:6px'},[
+        h('span',{},RESEARCH[t].name),
+        h('input',{type:'number', min:0, value:0, id:'op_tech_'+t, style:'width:90px; background:#0b1023; color:var(--text); border:1px solid #263041; border-radius:6px; padding:6px'})
+      ]))
+    ])
+    grid.appendChild(shipCol); grid.appendChild(defCol); grid.appendChild(techCol)
+    root.appendChild(grid)
+  }
+
+  // ====== Costuri scalate (creștere simplă) ======
+  function scaledCost(base, lvl){
+    const f = 1 + 0.15*lvl - 0.02*S.facilitati.Factory // fabrica reduce ușor costul
+    return { M: Math.ceil(base.M*f), C: Math.ceil(base.C*f), D: Math.ceil(base.D*f) }
+  }
+
+  // ====== Acțiuni ======
+  function upgradeBuilding(key){
+    const lvl = S.buildings[key]
+    const cost = scaledCost(BUILDINGS[key].cost, lvl)
+    if(!canAfford(cost)) return
+    pay(cost)
+    S.buildings[key]++
+    renderHUD(); renderBuildingsList(); renderConstructii()
+  }
+
+  function upgradeFacilitate(key){
+    const lvl = S.facilitati[key]
+    const cost = scaledCost(FACILITATI[key].cost, lvl)
+    if(!canAfford(cost)) return
+    pay(cost)
+    S.facilitati[key]++
+    renderHUD(); renderFacilitati()
+  }
+
+  function doResearch(key){
+    if(S.facilitati.Lab<=0) return
+    const lvl = S.research[key]
+    const cost = scaledCost(RESEARCH[key].cost, lvl)
+    if(!canAfford(cost)) return
+    pay(cost)
+    S.research[key]++
+    renderHUD(); renderResearch()
+  }
+
+  function buildUnit(kind, key){
+    const cfg = UNITS[kind][key]
+    if(!canAfford(cfg.cost)) return
+    pay(cfg.cost)
+    S[kind][key]++
+    renderHUD(); if(kind==='ships') renderShips(); else renderDefense(); renderFleetTables()
+  }
+
+  
+
+
+
+  // ====== Export / Import ======
+  function exportSave(){
+    const blob = new Blob([JSON.stringify(S,null,2)],{type:'application/json'})
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href=url; a.download='miniOgame_save.json'; a.click(); URL.revokeObjectURL(url)
+  }
+
+  function resetGame(){
+    if(!confirm('Sigur resetezi jocul?')) return
+    localStorage.removeItem('miniOgameSave')
+    S = JSON.parse(JSON.stringify(DEFAULT_STATE))
+    S.lastTick=Date.now()
+    renderAll()
+  }
+
+  
+
+  // ====== Hook butoane / inițializare ======
+  byId('btnSimulate').addEventListener('click', ()=>{
+    const A = { units: {...S.ships}, tech: {...S.research} }
+    const D = collectOpponentFromUI()
+    const res = simulateBattle(A,D)
+    const sumA0 = sumFleet(effectiveStats(A, D.tech))
+    const sumD0 = sumFleet(effectiveStats(D, A.tech))
+    const sumAf = sumFleet(res.finalA)
+    const sumDf = sumFleet(res.finalD)
+    pushReport(`
+      <div><strong>Rezultat:</strong> <span class="${res.winner.includes('Atacator')?'good':res.winner.includes('Apărător')?'bad':'warn'}">${res.winner}</span></div>
+      <div class="sep"></div>
+      <table>
+        <tr><th></th><th class="right">ATK total</th><th class="right">HP total</th></tr>
+        <tr><td>Atacator (inițial)</td><td class="right">${fmt(sumA0.atk)}</td><td class="right">${fmt(sumA0.hp)}</td></tr>
+        <tr><td>Apărător (inițial)</td><td class="right">${fmt(sumD0.atk)}</td><td class="right">${fmt(sumD0.hp)}</td></tr>
+        <tr><td>Atacator (final)</td><td class="right">${fmt(sumAf.atk)}</td><td class="right">${fmt(sumAf.hp)}</td></tr>
+        <tr><td>Apărător (final)</td><td class="right">${fmt(sumDf.atk)}</td><td class="right">${fmt(sumDf.hp)}</td></tr>
+      </table>
+      <div class="sep"></div>
+      <details><summary>Timeline runde</summary>
+        ${res.timeline.map(t=>`<div>Runda ${t.r}: Atacator HP ${fmt(t.A.hp)}, Apărător HP ${fmt(t.D.hp)}</div>`).join('')}
+      </details>
+    `)
+  })
+
+  byId('btnQuick').addEventListener('click', ()=>{
+    const R = randomOpponent()
+    // populate UI
+    Object.keys(UNITS.ships).forEach(k=> byId('op_ship_'+k).value = R.units[k]||0)
+    Object.keys(UNITS.defense).forEach(k=> byId('op_def_'+k).value = R.units[k]||0)
+    ;['Weapons','Shields','Armour'].forEach(t=> byId('op_tech_'+t).value = R.tech[t])
+  })
+
+  byId('btnExport').addEventListener('click', exportSave)
+  byId('btnReset').addEventListener('click', resetGame)
+  byId('fileImport').addEventListener('change', (e)=>{
+    const f = e.target.files[0]; if(!f) return
+    const reader=new FileReader(); reader.onload=()=>{ try{ S=JSON.parse(reader.result); renderAll(); saveState() }catch{ alert('Fișier invalid') } }; reader.readAsText(f)
+  })
+
+  // ====== Redesenare generală ======
+  function renderAll(){
+    renderHUD(); renderBuildingsList(); renderConstructii(); renderFacilitati(); renderResearch(); renderShips(); renderDefense(); renderFleetTables(); renderOpponentBuilder(); byId('reportLog').innerHTML = S.reports.map(r=>`<div class="sep"></div>${r}`).join('')
+  }
+  renderAll()
+
+  </script>
+</body>
+</html>

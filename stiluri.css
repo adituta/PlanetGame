@@ -1,0 +1,71 @@
+/* ======= Stil simplu, clar, fără librării externe ======= */
+    :root{
+      --bg:#0f172a;          /* slate-900 */
+      --panel:#111827;       /* gray-900 */
+      --muted:#1f2937;       /* gray-800 */
+      --text:#e5e7eb;        /* gray-200 */
+      --primary:#38bdf8;     /* sky-400 */
+      --accent:#a78bfa;      /* violet-400 */
+      --good:#22c55e;        /* green-500 */
+      --bad:#ef4444;         /* red-500 */
+      --warn:#f59e0b;        /* amber-500 */
+    }
+
+
+    *{box-sizing:border-box}
+
+
+    body{
+      margin:0; font-family:system-ui,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial; color:var(--text); background:linear-gradient(180deg,#0b1023, #0f172a 40%);
+    }
+
+    header{
+      padding:16px; display:flex; align-items:center; justify-content:space-between; background:rgba(17,24,39,.8); position:sticky; top:0; backdrop-filter: blur(8px); border-bottom:1px solid #263041;
+    }
+
+    .title{font-weight:700; letter-spacing:.3px}
+
+    .badge{font-size:12px; padding:2px 8px; border:1px solid #2a3b57; border-radius:999px; color:#93c5fd}
+    
+    .container{max-width:1100px; margin:18px auto; padding:0 12px}
+
+    /* Top HUD */
+    .hud{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px}
+    .card{background:var(--panel); border:1px solid #263041; border-radius:12px; padding:12px}
+    .row{display:flex; align-items:center; justify-content:space-between; gap:8px}
+    .label{opacity:.8; font-size:12px}
+    .value{font-variant-numeric:tabular-nums; font-weight:700}
+
+    /* Meniu */
+    nav{display:flex; gap:8px; flex-wrap:wrap; margin:16px 0}
+    .tab{padding:10px 12px; border-radius:10px; border:1px solid #263041; background:var(--muted); cursor:pointer}
+    .tab.active{background:var(--accent); color:#0b1023; border-color:#6d52d8}
+
+    /* Conținut */
+    .grid{display:grid; grid-template-columns:1.2fr .8fr; gap:14px}
+    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+    .list{display:flex; flex-direction:column; gap:10px}
+    .item{display:flex; justify-content:space-between; align-items:center; padding:10px; border:1px solid #263041; border-radius:10px; background:#0f1a30}
+    button{cursor:pointer; border:1px solid #334155; background:#0f172a; color:var(--text); padding:8px 10px; border-radius:8px}
+    button.primary{background:var(--primary); color:#082636; border-color:#2aa6db; font-weight:700}
+    button:disabled{opacity:.5; cursor:not-allowed}
+    .hint{opacity:.7; font-size:12px}
+    .sep{height:1px; background:#243045; margin:10px 0}
+
+    /* Tabele simple */
+    table{width:100%; border-collapse:collapse}
+    th,td{border-bottom:1px solid #263041; padding:8px 6px; text-align:left}
+    th{opacity:.8; font-weight:600}
+    .right{text-align:right}
+
+    /* Log & rapoarte */
+    .log{max-height:260px; overflow:auto; padding:8px; background:#0c1426; border:1px dashed #2a3b57; border-radius:10px}
+    .good{color:var(--good)}
+    .bad{color:var(--bad)}
+    .warn{color:var(--warn)}
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .grid{grid-template-columns:1fr}
+      .hud{grid-template-columns:repeat(2,1fr)}
+    }
